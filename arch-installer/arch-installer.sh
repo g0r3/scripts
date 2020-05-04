@@ -243,6 +243,7 @@ useradd -m -g users -s /bin/zsh $username
 /usr/bin/sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
 /usr/bin/gpasswd -a $username wheel
 /usr/bin/gpasswd -a $username uucp #For Arduino IDE tty access
+/usr/bin/gpasswd -a $username cups #Allow him to change printer settings
 EOF
 
 
