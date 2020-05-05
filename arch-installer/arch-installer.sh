@@ -231,6 +231,7 @@ arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/sed -i '/^#en_US.UTF-8/s/^#//' /etc/locale.gen
 /usr/bin/sed -i '/^#de_DE.UTF-8/s/^#//' /etc/locale.gen
 /usr/bin/locale-gen
+localedef -i de_DE -f UTF-8 en_DE.UTF-8
 /usr/bin/ln -s /usr/share/zoneinfo/$timezone /etc/localtime
 /usr/bin/mkinitcpio -p linux-zen
 EOF
