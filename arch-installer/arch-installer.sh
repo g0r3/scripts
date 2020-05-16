@@ -209,7 +209,7 @@ arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/mkdir -p /boot/efi
 /usr/bin/mount ${disk}${partprefix}1 /boot/efi
 /usr/bin/refind-install
-/usr/bin/echo '"Boot using standard options"  "root=PARTUUID='${PARTUUID}' rw rootflags=subvol=@ quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=0"' > /boot/refind_linux.conf
+/usr/bin/echo '"Boot using standard options"  "root=PARTUUID='${PARTUUID}' rw rootflags=subvol=@ quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=0 net.ifnames=0"' > /boot/refind_linux.conf
 /usr/bin/sed -i '/^#also_scan_dirs.*/c\also_scan_dirs @/boot' /boot/efi/EFI/refind/refind.conf
 /usr/bin/sed -i '/^timeout.*/c\timeout 3' /boot/efi/EFI/refind/refind.conf
 EOF
