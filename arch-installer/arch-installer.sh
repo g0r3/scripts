@@ -236,17 +236,6 @@ localedef -i de_DE -f UTF-8 en_DE.UTF-8
 /usr/bin/mkinitcpio -p linux-zen
 EOF
 
-# Setup users and sudo
-arch-chroot /mnt /bin/bash <<EOF
-/usr/bin/echo "root:$rootpw" | /usr/bin/chpasswd
-useradd -m -g users -s /bin/zsh $username
-/usr/bin/echo "$username:$userpw" | /usr/bin/chpasswd
-/usr/bin/sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
-/usr/bin/gpasswd -a $username wheel
-/usr/bin/gpasswd -a $username uucp #For Arduino IDE tty access
-/usr/bin/gpasswd -a $username cups #Allow him to change printer settings
-EOF
-
 
 print_header "Installing and configuring daemons..."
 
@@ -259,6 +248,20 @@ arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/systemctl enable cronie
 /usr/bin/systemctl enable NetworkManager.service
 /usr/bin/systemctl enable dhcpcd
+EOF
+
+
+print_header "Setting up user account..."
+
+# Setup users and sudo
+arch-chroot /mnt /bin/bash <<EOF
+/usr/bin/echo "root:$rootpw" | /usr/bin/chpasswd
+useradd -m -g users -s /bin/zsh $username
+/usr/bin/echo "$username:$userpw" | /usr/bin/chpasswd
+/usr/bin/sed -i 's/^# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers
+/usr/bin/gpasswd -a $username wheel
+/usr/bin/gpasswd -a $username uucp #For Arduino IDE tty access
+/usr/bin/gpasswd -a $username cups #Allow him to change printer settings
 EOF
 
 
@@ -340,14 +343,14 @@ EOF
 print_header "Installing KDE Desktop and setting it up..."
 
 arch-chroot /mnt /bin/bash <<EOF
-/usr/bin/pacman -S --noconfirm plasma okular dolphin system-config-printer alsa-utils korganizer konsole gnome-calculator gwenview qt5-imageformats kimageformats simple-scan kmail kaddressbook partitionmanager kdf ark filelight latte-dock spectacle appmenu-gtk-module lib32-libdbusmenu-glib lib32-libdbusmenu-gtk2 lib32-libdbusmenu-gtk3 libdbusmenu-glib libdbusmenu-gtk2 libdbusmenu-gtk3 libdbusmenu-qt5 kwallet-pam kwalletmanager elisa print-manager
+/usr/bin/pacman -S --noconfirm plasma okular dolphin system-config-printer alsa-utils korganizer konsole gnome-calculator gwenview qt5-imageformats kimageformats simple-scan geary kaddressbook partitionmanager kdf ark filelight latte-dock spectacle appmenu-gtk-module lib32-libdbusmenu-glib lib32-libdbusmenu-gtk2 lib32-libdbusmenu-gtk3 libdbusmenu-glib libdbusmenu-gtk2 libdbusmenu-gtk3 libdbusmenu-qt5 kwallet-pam kwalletmanager elisa print-manager
 /usr/bin/systemctl enable sddm
-/usr/bin/localectl set-x11-keymap de
+#/usr/bin/localectl set-x11-keymap de
 EOF
 
 
 print_header "Installing other stuff..."
 
 arch-chroot /mnt /bin/bash <<EOF
-/usr/bin/pacman -S --noconfirm nfs-utils libreoffice keepassxc timeshift
+/usr/bin/pacman -S --noconfirm nfs-utils libreoffice keepassxc
 EOF
