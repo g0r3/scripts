@@ -197,7 +197,7 @@ pacman -S --noconfirm pacman-contrib
 #rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
 #curl -s "https://www.archlinux.org/mirrorlist/?country=DE&country=FR&country=GB&protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 10 - >> /etc/pacman.d/mirrorlist
 #pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g efibootmgr grub-efi-x86_64 btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
-pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g dmidecode efibootmgr refind-efi btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
+pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g dmidecode efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
 
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
@@ -231,7 +231,7 @@ arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/sed -i '/^#en_US.UTF-8/s/^#//' /etc/locale.gen
 /usr/bin/sed -i '/^#de_DE.UTF-8/s/^#//' /etc/locale.gen
 /usr/bin/locale-gen
-localedef -i de_DE -f UTF-8 en_DE.UTF-8
+/usr/bin/localedef -i de_DE -f UTF-8 en_DE.UTF-8
 /usr/bin/ln -s /usr/share/zoneinfo/$timezone /etc/localtime
 /usr/bin/mkinitcpio -p linux-zen
 EOF
@@ -275,7 +275,7 @@ EOF
 print_header "Installing common graphics acceleration packages..."
 
 arch-chroot /mnt /bin/bash <<EOF
-/usr/bin/pacman -S --noconfirm mesa vulkan-mesa-layer lib32-mesa
+/usr/bin/pacman -S --noconfirm mesa vulkan-mesa-layers lib32-mesa
 EOF
 
 
@@ -316,7 +316,7 @@ if [ "$(/mnt/usr/bin/dmidecode -s system-product-name)" == "MACH-WX9" ]; then
     print_header "Matebook Pro X specific config..."
 
     arch-chroot /mnt /bin/bash <<EOF
-    /usr/bin/pacman -S --noconfirm tlp tlp-rdw ethtool lsb-release smartmontools
+    /usr/bin/pacman -S --noconfirm tlp tlp-rdw ethtool lsb-release smartmontools powertop xf86-input-synaptics
     /usr/bin/systemctl enable tlp.service
     /usr/bin/systemctl enable tlp-sleep.service
     /usr/bin/systemctl mask systemd-rfkill.service
