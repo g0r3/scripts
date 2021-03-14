@@ -197,7 +197,7 @@ pacman -S --noconfirm pacman-contrib
 #rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
 #curl -s "https://www.archlinux.org/mirrorlist/?country=DE&country=FR&country=GB&protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 10 - >> /etc/pacman.d/mirrorlist
 #pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g efibootmgr grub-efi-x86_64 btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
-pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g dmidecode efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
+pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g dmidecode bluez bluez-utils efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
 
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
@@ -211,6 +211,7 @@ arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/refind-install
 /usr/bin/echo '"Boot using standard options"  "root=PARTUUID='${PARTUUID}' rw rootflags=subvol=@ quiet splash loglevel=3 rd.udev.log_priority=3 vt.global_cursor_default=0 net.ifnames=0"' > /boot/refind_linux.conf
 /usr/bin/sed -i '/^#also_scan_dirs.*/c\also_scan_dirs @/boot' /boot/efi/EFI/refind/refind.conf
+/usr/bin/sed -i '/^#use_graphics_for osx,linux/c\use_graphics_for osx,linux' /boot/efi/EFI/refind/refind.conf
 /usr/bin/sed -i '/^timeout.*/c\timeout 3' /boot/efi/EFI/refind/refind.conf
 EOF
 
@@ -248,6 +249,8 @@ arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/systemctl enable cronie
 /usr/bin/systemctl enable NetworkManager.service
 /usr/bin/systemctl enable dhcpcd
+/usr/bin/sed -i '/^AutoEnable=false/c\AutoEnable=true' /etc/bluetooth/main.conf
+/usr/bin/systemctl enable bluetooth.service
 EOF
 
 
