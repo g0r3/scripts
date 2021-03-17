@@ -227,12 +227,12 @@ EOF
 arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/echo "KEYMAP=de-latin1" > /etc/vconsole.conf
 /usr/bin/echo "desktop" > /etc/hostname
-/usr/bin/echo "LANG=en_US.UTF-8" > /etc/locale.conf
+/usr/bin/echo "LANG=en_IE.UTF-8" > /etc/locale.conf
 /usr/bin/hwclock --systohc --utc
 /usr/bin/sed -i '/^#en_US.UTF-8/s/^#//' /etc/locale.gen
+/usr/bin/sed -i '/^#en_IE.UTF-8/s/^#//' /etc/locale.gen
 /usr/bin/sed -i '/^#de_DE.UTF-8/s/^#//' /etc/locale.gen
 /usr/bin/locale-gen
-/usr/bin/localedef -i de_DE -f UTF-8 en_DE.UTF-8
 /usr/bin/ln -s /usr/share/zoneinfo/$timezone /etc/localtime
 /usr/bin/mkinitcpio -p linux-zen
 EOF
