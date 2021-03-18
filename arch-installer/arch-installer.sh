@@ -304,7 +304,7 @@ if [ $(lspci | grep "3D\|VGA" | grep -o "NVIDIA Corporation" | wc -l) -ge 1 ]; t
     print_header "Installing Nvidia specific graphics driver..."
     initcpiodrivers=$initcpiodrivers"nvidia "
     arch-chroot /mnt /bin/bash <<EOF
-    /usr/bin/pacman -S --noconfirm nvidia lib32-nvidia-utils
+    /usr/bin/pacman -S --noconfirm linux-zen-headers nvidia-dkms lib32-nvidia-utils
 EOF
 fi
 
