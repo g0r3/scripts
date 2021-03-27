@@ -197,7 +197,7 @@ pacman -S --noconfirm pacman-contrib
 #rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
 #curl -s "https://www.archlinux.org/mirrorlist/?country=DE&country=FR&country=GB&protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 10 - >> /etc/pacman.d/mirrorlist
 #pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g efibootmgr grub-efi-x86_64 btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
-pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g dmidecode bluez bluez-utils efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
+pacstrap /mnt base base-devel linux-zen linux-firmware mlocate xf86-input-evdev hdparm mkinitcpio ntfs-3g dmidecode bluez bluez-utils efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
 
 cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
 
