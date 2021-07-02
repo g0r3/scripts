@@ -161,10 +161,9 @@ class RemoteFile(object):
         return hash
 
     def download(self, local_save_path):
-        downloaded = False
         tries = 0
 
-        while not downloaded:
+        while True:
             try:
                 logger("Starting download of %s" % self.remote_url)
                 file_size = self.__get_content_length()
