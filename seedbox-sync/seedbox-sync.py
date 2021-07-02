@@ -14,15 +14,20 @@ from requests.auth import HTTPBasicAuth
 from urllib.parse import quote
 from urllib.parse import unquote
 from datetime import datetime
-
+from urllib3.exceptions import ReadTimeoutError
+from requests.exceptions import ConnectionError
 
 DIR_REGEX = re.compile('<a href=\"(.+)\">(.+)</a>\s+(\d{2}-[A-Za-z]{3}-\d{4} \d{2}:\d{2})\s+([-0-9]+)$')
 USERNAME = None
 PASSWORD = None
-TIMEOUT = 300 #seconds
+TIMEOUT = 60  # seconds
+RETRY_COUNTER = 5
 working_directory = None
 
-class IllegalResponseException(Exception): pass
+
+class IllegalResponseException(Exception):
+    pass
+
 
 class RemoteFile(object):
     '''
@@ -46,10 +51,10 @@ class RemoteFile(object):
             headers = {"Range": "bytes=%s-%s" % (startindex, startindex + length-1)}
         try:
             r = requests.get(url=self.remote_url,
-                         stream=True,
-                         auth=HTTPBasicAuth(self.username, self.password),
-                         headers=headers,
-                         timeout=TIMEOUT)
+                             stream=True,
+                             auth=HTTPBasicAuth(self.username, self.password),
+                             headers=headers,
+                             timeout=TIMEOUT)
             if r.status_code != 200 and \
                r.status_code != 206:
                 raise IllegalResponseException("Status code: %s\n Reason: %s" % (r.status_code, r.reason))
@@ -156,28 +161,45 @@ class RemoteFile(object):
         return hash
 
     def download(self, local_save_path):
+        downloaded = False
+        tries = 0
 
-        logger("Starting download of %s" % self.remote_url)
-        filesize = self.__get_content_length()
+        while not downloaded:
+            try:
+                logger("Starting download of %s" % self.remote_url)
+                file_size = self.__get_content_length()
 
-        if filesize <= self.PART_DOWNLOAD_CHUNK_LEN:
-            logger("File is smaller or equal than %s Bytes. Will download it as a whole." % self.PART_DOWNLOAD_CHUNK_LEN)
-            self.__download_full_file(local_save_path)
-        else:
-            logger("File is bigger than %s Bytes. Will download it in sessions." % self.PART_DOWNLOAD_CHUNK_LEN)
-            number_of_chunks = filesize // self.PART_DOWNLOAD_CHUNK_LEN
+                if file_size <= self.PART_DOWNLOAD_CHUNK_LEN:
+                    logger("File is smaller or equal than %s Bytes. Will download it as a whole." % self.PART_DOWNLOAD_CHUNK_LEN)
+                    self.__download_full_file(local_save_path)
+                    break
+                else:
+                    logger("File is bigger than %s Bytes. Will download it in sessions." % self.PART_DOWNLOAD_CHUNK_LEN)
+                    number_of_chunks = file_size // self.PART_DOWNLOAD_CHUNK_LEN
 
-            if filesize % self.PART_DOWNLOAD_CHUNK_LEN > 0:
-                number_of_chunks += 1
+                    if file_size % self.PART_DOWNLOAD_CHUNK_LEN > 0:
+                        number_of_chunks += 1
 
-            for x in range(0, number_of_chunks):
-                logger("Downloading chunk %s of %s" %(x + 1, number_of_chunks))
-                lowerindex = x * self.PART_DOWNLOAD_CHUNK_LEN
+                    for x in range(0, number_of_chunks):
+                        logger("Downloading chunk %s of %s" %(x + 1, number_of_chunks))
+                        lower_index = x * self.PART_DOWNLOAD_CHUNK_LEN
 
-                if (x + 1) == number_of_chunks: # adapt length of last chunk to filesize
-                    self.PART_DOWNLOAD_CHUNK_LEN = filesize - lowerindex
-                self.__partial_file_download(local_save_path, lowerindex, self.PART_DOWNLOAD_CHUNK_LEN, force_del=(x == 0))
+                        if (x + 1) == number_of_chunks: # adapt length of last chunk to filesize
+                            self.PART_DOWNLOAD_CHUNK_LEN = file_size - lower_index
+                        self.__partial_file_download(local_save_path,
+                                                     lower_index,
+                                                     self.PART_DOWNLOAD_CHUNK_LEN,
+                                                     force_del=(x == 0))
+                        break
+            except (ConnectionError,  ReadTimeoutError, ReadTimeoutError) as e:
+                tries += 1
+                logger("A exception occured while downloading the file:")
+                logger(e)
+                if tries >= RETRY_COUNTER:
+                    logger("File download unsuccessful. Skipping this file")
+                    return 1
 
+        return 0
 
 class PersistantFileList(object):
     '''
@@ -247,8 +269,8 @@ def get_local_hash(filename):
 
 def mirror_directory(finished_file_list, from_remote_dir, to_local_dir, root =""):
     global USERNAME, PASSWORD
-    dirlisting = get_dir_listing(from_remote_dir)
-    for file in dirlisting:
+    dir_listing = get_dir_listing(from_remote_dir)
+    for file in dir_listing:
         if file["is_directory"]:
             mirror_directory(finished_file_list=finished_file_list,
                              from_remote_dir=os.path.join(from_remote_dir, file["link_text"]),
@@ -267,7 +289,10 @@ def mirror_directory(finished_file_list, from_remote_dir, to_local_dir, root =""
             if not os.path.exists(os.path.dirname(local_save_path)):
                 os.makedirs(os.path.dirname(local_save_path))
             remote_file = RemoteFile(remote_url=remote_file_path, username=USERNAME, password=PASSWORD)
-            remote_file.download(local_save_path)
+
+            if remote_file.download(local_save_path) == 1:
+                # file download was not successful. Hence skip out of this iteration
+                continue
             logger("Download finished")
 
             # Check file integrity
