@@ -190,7 +190,7 @@ class RemoteFile(object):
                                                      lower_index,
                                                      self.PART_DOWNLOAD_CHUNK_LEN,
                                                      force_del=(x == 0))
-                        break
+                    break
             except (ConnectionError,  ReadTimeoutError, ReadTimeoutError) as e:
                 tries += 1
                 logger("A exception occured while downloading the file:")
