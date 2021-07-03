@@ -105,7 +105,7 @@ class RemoteFile(object):
 
         def __do_post_request_with_data(data):
             headers = {"content-type": "application/x-www-form-urlencoded; charset=UTF-8"}
-            r = requests.post(url="https://psb44098.seedbox.io/rutorrent/plugins/filemanager/flm.php",
+            r = requests.post(url="https://%s.seedbox.io/rutorrent/plugins/filemanager/flm.php" % USERNAME,
                               auth=HTTPBasicAuth(USERNAME, PASSWORD),
                               data=quote(data, safe='=&'),
                               headers=headers,
@@ -150,7 +150,7 @@ class RemoteFile(object):
         try:
             hash = response["lines"].split("Hash: ")[1].split("\n")[0].upper()
         except json.decoder.JSONDecodeError:
-            response = requests.get(url="https://psb44098.seedbox.io/files/%s" % checksum_file_name,
+            response = requests.get(url="https://%s.seedbox.io/files/%s" % (USERNAME, checksum_file_name),
                                     stream=True,
                                     auth=HTTPBasicAuth(USERNAME, PASSWORD),
                                     timeout=TIMEOUT)
