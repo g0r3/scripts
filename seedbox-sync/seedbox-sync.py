@@ -117,17 +117,17 @@ class RemoteFile(object):
             response = __do_post_request_with_data(data)
             errcode = response["errcode"]
             if errcode != 0:
-                print("There was a problem when deleting the file /%s" % checksum_file_name)
+                logger("There was a problem when deleting the file /%s" % checksum_file_name)
                 raise Exception(response)
 
+        logger("Cleaning up old files...")
         __delete_remote_file()
-
         data = 'dir=%s&action=sfvcr&target=/%s&fls={"0":"%s"}' % (working_dir, checksum_file_name, file_to_check)
         response = __do_post_request_with_data(data)
 
         errcode = response["errcode"]
         if errcode != 0:
-            print("There was a problem when deleting the file /%s" % checksum_file_name)
+            logger("There was a problem when deleting the file /%s" % checksum_file_name)
             raise Exception(response)
 
         target = response["tmpdir"]
@@ -141,9 +141,10 @@ class RemoteFile(object):
                 status = response["status"]
             except KeyError:
                 fails += 1
-                print(data)
-                logger(response)
                 if fails > 5:
+                    logger("Could not retrieve status for checksum file.")
+                    logger(data)
+                    logger(response)
                     break
             time.sleep(5)
 
@@ -278,7 +279,7 @@ def mirror_directory(finished_file_list, from_remote_dir, to_local_dir, root =""
         else:
             remote_file_path = os.path.join(from_remote_dir, file["link_text"])
             if finished_file_list.contains(remote_file_path):
-                print("%s was already downloaded. Skipping." % remote_file_path)
+                logger("%s was already downloaded. Skipping." % remote_file_path)
                 continue
 
             # build local save path and do the download
