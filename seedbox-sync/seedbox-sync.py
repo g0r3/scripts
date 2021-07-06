@@ -131,7 +131,8 @@ class RemoteFile(object):
             raise Exception(response)
 
         target = response["tmpdir"]
-
+        logger("Target is:")
+        logger(target)
         status = 0
         fails = 0
         while status == 0:
@@ -146,7 +147,7 @@ class RemoteFile(object):
                     logger(data)
                     logger(response)
                     break
-            time.sleep(5)
+            time.sleep(20)
 
         try:
             hash = response["lines"].split("Hash: ")[1].split("\n")[0].upper()
