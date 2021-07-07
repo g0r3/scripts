@@ -151,7 +151,7 @@ class RemoteFile(object):
 
         try:
             hash = response["lines"].split("Hash: ")[1].split("\n")[0].upper()
-        except (json.decoder.JSONDecodeError, IndexError):
+        except (json.decoder.JSONDecodeError, IndexError, KeyError):
             response = requests.get(url="https://%s.seedbox.io/files/%s" % (USERNAME, checksum_file_name),
                                     stream=True,
                                     auth=HTTPBasicAuth(USERNAME, PASSWORD),
