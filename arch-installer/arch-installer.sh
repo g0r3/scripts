@@ -190,16 +190,7 @@ print_header "Installing base system..."
 microcode=$(cat /proc/cpuinfo | grep -m 1 "GenuineIntel" > /dev/null && echo "intel-ucode")
 
 pacman -Sy
-pacman -S --noconfirm pacman-contrib
-#echo "Determining fastest mirrors..."
-#cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
-#sed -i 's/^#Server/Server/' /etc/pacman.d/mirrorlist.backup
-#rankmirrors -n 10 /etc/pacman.d/mirrorlist.backup /etc/pacman.d/mirrorlist
-#curl -s "https://www.archlinux.org/mirrorlist/?country=DE&country=FR&country=GB&protocol=https&use_mirror_status=on" | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 10 - >> /etc/pacman.d/mirrorlist
-#pacstrap /mnt base base-devel linux-zen linux-firmware mlocate mkinitcpio ntfs-3g efibootmgr grub-efi-x86_64 btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
-pacstrap /mnt base base-devel linux-zen linux-firmware mlocate xf86-input-evdev hdparm mkinitcpio ntfs-3g dmidecode bluez bluez-utils efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
-
-cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/mirrorlist
+pacstrap /mnt base base-devel linux linux-firmware mlocate xf86-input-evdev hdparm mkinitcpio dmidecode bluez bluez-utils efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
 
 print_header "Configuring base system..."
 
@@ -234,7 +225,7 @@ arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/sed -i '/^#de_DE.UTF-8/s/^#//' /etc/locale.gen
 /usr/bin/locale-gen
 /usr/bin/ln -s /usr/share/zoneinfo/$timezone /etc/localtime
-/usr/bin/mkinitcpio -p linux-zen
+/usr/bin/mkinitcpio -p linux
 EOF
 
 
@@ -245,7 +236,7 @@ arch-chroot /mnt /bin/bash <<EOF
 /usr/bin/pacman -Syu
 /usr/bin/pacman -S --noconfirm acpid dbus cups cronie dhcpcd
 /usr/bin/systemctl enable acpid
-/usr/bin/systemctl enable org.cups.cupsd.service
+/usr/bin/systemctl enable cups.service
 /usr/bin/systemctl enable cronie
 /usr/bin/systemctl enable NetworkManager.service
 /usr/bin/systemctl enable dhcpcd
@@ -304,7 +295,7 @@ if [ $(lspci | grep "3D\|VGA" | grep -o "NVIDIA Corporation" | wc -l) -ge 1 ]; t
     print_header "Installing Nvidia specific graphics driver..."
     initcpiodrivers=$initcpiodrivers"nvidia "
     arch-chroot /mnt /bin/bash <<EOF
-    /usr/bin/pacman -S --noconfirm linux-zen-headers nvidia-dkms lib32-nvidia-utils
+    /usr/bin/pacman -S --noconfirm linux-headers nvidia-dkms lib32-nvidia-utils
 EOF
 fi
 
