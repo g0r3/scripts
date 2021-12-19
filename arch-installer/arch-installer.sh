@@ -337,7 +337,7 @@ EOF
 print_header "Installing KDE Desktop and setting it up..."
 
 arch-chroot /mnt /bin/bash <<EOF
-/usr/bin/pacman -S --noconfirm plasma gnome-disk-utility okular dolphin system-config-printer alsa-utils korganizer konsole gnome-calculator gwenview qt5-imageformats kimageformats simple-scan geary kaddressbook partitionmanager kdf ark filelight latte-dock spectacle appmenu-gtk-module lib32-libdbusmenu-glib lib32-libdbusmenu-gtk2 lib32-libdbusmenu-gtk3 libdbusmenu-glib libdbusmenu-gtk2 libdbusmenu-gtk3 libdbusmenu-qt5 kwallet-pam kwalletmanager elisa print-manager
+/usr/bin/pacman -S --noconfirm plasma gnome-disk-utility okular dolphin system-config-printer alsa-utils kalendar konsole gnome-calculator gwenview qt5-imageformats kimageformats simple-scan geary kaddressbook partitionmanager kdf ark filelight latte-dock spectacle appmenu-gtk-module lib32-libdbusmenu-glib lib32-libdbusmenu-gtk2 lib32-libdbusmenu-gtk3 libdbusmenu-glib libdbusmenu-gtk2 libdbusmenu-gtk3 libdbusmenu-qt5 kwallet-pam kwalletmanager elisa print-manager
 /usr/bin/systemctl enable sddm
 #/usr/bin/localectl set-x11-keymap de
 EOF
