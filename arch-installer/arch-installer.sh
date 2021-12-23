@@ -190,7 +190,7 @@ print_header "Installing base system..."
 microcode=$(cat /proc/cpuinfo | grep -m 1 "GenuineIntel" > /dev/null && echo "intel-ucode")
 
 pacman -Sy
-pacstrap /mnt base base-devel linux linux-firmware mlocate xf86-input-evdev hdparm mkinitcpio dmidecode bluez bluez-utils efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
+pacstrap /mnt base base-devel linux linux-firmware mlocate xf86-input-evdev hdparm mkinitcpio dmidecode bluez exfatprogs f2fs-tools udftools bluez-utils efibootmgr man refind btrfs-progs neovim openssh wpa_supplicant networkmanager git sudo zsh $microcode
 
 print_header "Configuring base system..."
 
